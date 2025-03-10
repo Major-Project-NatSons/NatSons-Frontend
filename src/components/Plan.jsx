@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Plan = () => {
   useEffect(() => {
@@ -10,6 +11,12 @@ const Plan = () => {
       spot.style.animationDuration = duration;
     });
   }, []);
+
+  const navigate = useNavigate(); 
+
+  const planview = () => {
+    navigate('/planview'); 
+  };
 
   return (
     <div className='bg-white w-full h-full relative overflow-hidden'>
@@ -30,7 +37,7 @@ const Plan = () => {
           renovation project in a few simple steps.
         </span>
 
-        <button className="mt-6 px-6 py-3 bg-gradient-to-r from-yellow-600 to-black text-white hover:from-yellow-500 hover:to-gray-800 rounded-full">
+        <button onClick={planview} className="mt-6 px-6 py-3 bg-gradient-to-r from-yellow-600 to-black text-white hover:from-yellow-500 hover:to-gray-800 rounded-full">
           GET STARTED - IT'S FREE
         </button>
       </div>

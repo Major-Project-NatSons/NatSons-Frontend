@@ -70,16 +70,6 @@ const Navbar = () => {
           Buy
         </NavLink>
         <NavLink
-          to="/attendance"
-          className={({ isActive }) =>
-            `text-gray-800 hover:text-blue-600 ${
-              isActive ? 'border-b-2 border-blue-600 font-semibold' : ''
-            } transition-all duration-300`
-          }
-        >
-          Attendance
-        </NavLink>
-        <NavLink
           to="/sell"
           className={({ isActive }) =>
             `text-gray-800 hover:text-blue-600 ${
@@ -88,6 +78,16 @@ const Navbar = () => {
           }
         >
           Forum
+        </NavLink>
+        <NavLink
+          to="/attendance"
+          className={({ isActive }) =>
+            `text-gray-800 hover:text-blue-600 ${
+              isActive ? 'border-b-2 border-blue-600 font-semibold' : ''
+            } transition-all duration-300`
+          }
+        >
+          Attendance
         </NavLink>
         <NavLink
           to="/plan"

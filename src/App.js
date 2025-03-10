@@ -9,6 +9,8 @@ import Contact from "./components/Contact";
 import Plan from "./components/Plan";
 import LoginSignUp from "./components/LoginSignUp";
 import SignUp from "./components/SignUp";
+import Planview from "./components/planview";
+import AttendancePayment from "./components/attendancepayment";
 
 
 
@@ -30,6 +32,8 @@ function App() {
             <Route path="/plan" element={<Plan />} />
             <Route path="/login" element = {<LoginSignUp/>}/>
             <Route path='/signup' element={<SignUp />} />
+            <Route path="/planview" element={<Planview />}/>
+            <Route path="/attendance-payment" element={<AttendancePayment />} />
           </Routes>
         </div>
       </div>
