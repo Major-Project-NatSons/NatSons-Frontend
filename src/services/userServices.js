@@ -1,5 +1,5 @@
 import axios from "axios";
-import { userProfileIdAPI } from "./apiURLConstants";
+import { userProfileIdApi, userProfileIdAPI } from "./apiURLConstants";
 
 const getUser = async (userId) => {
   try {
@@ -17,7 +17,7 @@ const getUser = async (userId) => {
     }
 
     // Fetch data using axios
-    const response = await axios.get(`${userProfileIdAPI}${userId}`, {
+    const response = await axios.get(`${userProfileIdApi}${userId}`, {
       headers: {
         Authorization: token,
       },

@@ -1,18 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { addNewCountry, addNewState, getAllCountries, getStateByCountry } from "../services/countryServices";
+import { createNewHome } from "../services/homeDetailServices";
+import { uploadImage, uploadPdf } from "../services/mediaUploadService";
 
 const Sell = () => {
+  const [countryList, setCountryList] = useState([]);
+  const [stateList, setStateList] = useState([]);
+  const [Country_Id, setCountry_Id] = useState('');
+  const [stateId, setStateId] = useState('');
+  const [Country_name, setCountry_name] = useState('');
+  const [state_name, setState_name] = useState('');
   const [formData, setFormData] = useState({
     name: "",
     price: "",
+    countryId: null,
+    stateId: null,
     location: "",
     description: "",
+    zipcode: "",
+    city: "",
     frontImage: null,
-    otherImages: [
-      { image: null, desc: "" },
-      { image: null, desc: "" },
-      { image: null, desc: "" },
-      { image: null, desc: "" },
-    ],
+    otherImages: [],
     area: "",
     propertyType: "",
     builtUpArea: "",
@@ -33,6 +41,51 @@ const Sell = () => {
     governmentApproval: false,
     powerOfAttorney: false,
   });
+  const [image, setImage] = useState(null);
+  const [pdf, setPdf] = useState(null);
+
+  const handelStateList = (countryId) => {
+    getStateByCountry(countryId).then((response) => {
+      console.log(response.data);
+
+      setStateList(response.data);
+    }).catch((error) => {
+      console.error("Error fetching states:", error);
+    });
+  }
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    uploadImage(file).then((response) => {
+      console.log(response.data);
+      formData.otherImages.push(response.data.imageUrl);
+    }).catch((error) => {
+      console.error("Error uploading image:", error);
+    });
+    setImage(file);
+  };
+
+  const handlePdfUpload = (e) => {
+    const file = e.target.files[0];
+    uploadPdf(file).then((response) => {
+      console.log(response.data);
+      formData.pdf = response.data.imageUrl;
+    }).catch((error) => {
+      console.error("Error uploading pdf:", error);
+    });
+    setPdf(file);
+  };
+
+  useEffect(() => {
+    getAllCountries().then((response) => {
+      console.log(response.data);
+
+      setCountryList(response.data);
+    }).catch((error) => {
+      console.error("Error fetching countries:", error);
+    }
+    );
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -53,14 +106,82 @@ const Sell = () => {
     }
   };
 
+  const getCountry = () => {
+    getAllCountries().then((response) => {
+      setCountryList(response.data);
+    }).catch((error) => {
+      console.error("Error fetching countries:", error);
+    });
+  }
+
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
     setFormData({ ...formData, [name]: checked });
   };
 
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    var items = {
+      owner_name: formData.name,
+      description: formData.description,
+      address: formData.location,
+      country_id: formData.countryId,
+      state_id: formData.stateId,
+      city: formData.city,
+      zip_code: formData.zipcode,
+      area: parseFloat(formData.area),
+      number_of_rooms: parseInt(formData.rooms),
+      number_of_bathrooms: parseInt(formData.bathrooms),
+      no_of_kitchens: parseInt(formData.kitchen),
+      no_of_halls: parseInt(formData.halls),
+      property_type: formData.propertyType,
+      home_type: formData.rentsell,
+      price: parseInt(formData.price),
+      image: formData.otherImages,
+      main_img: formData.frontImage,
+    }
+    createNewHome(items).then((response) => {
+      console.log(response.data);
+      if (response.status === 200) {
+        alert("Home created successfully");
+      } else {
+        alert("Failed to create home");
+      }
+    }).catch((error) => {
+      console.error("Error creating home:", error);
+    });
     console.log("Form Data Submitted:", formData);
+  };
+
+  const handleCountryChange = (e) => {
+    const selectedValue = e.target.value;
+    console.log(selectedValue);
+    setCountry_Id(selectedValue);
+    if (selectedValue !== "Add Country" || selectedValue !== "Select Country") {
+      handelStateList(selectedValue);
+      setFormData({ ...formData, countryId: selectedValue });
+    }
+  };
+
+  const handelAddCountry = (e) => {
+    setCountry_name(e.target.value);
+  };
+
+  const handelAddState = (e) => {
+    setState_name(e.target.value);
+  };
+
+  const addCountry = () => {
+    addNewCountry({ country_name: Country_name }).then(() => {
+      console.log("Country Added");
+    })
+  };
+
+  const addState = () => {
+    addNewState({ stateName: state_name, countryId: Country_Id }).then(() => {
+      console.log("State Added");
+    })
   };
 
   return (
@@ -91,7 +212,7 @@ const Sell = () => {
             </div>
             <div>
               <label htmlFor="price" className="block text-gray-700 font-medium mb-2">
-                Price (IND) <span className="text-red-500">*</span>
+                Price (INR) <span className="text-red-500">*</span>
               </label>
               <input
                 id="price"
@@ -114,7 +235,7 @@ const Sell = () => {
                 name="description"
                 placeholder="Enter Description "
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
-                value={formData.price}
+                value={formData.description}
                 onChange={handleInputChange}
                 required
               />
@@ -122,9 +243,113 @@ const Sell = () => {
           </div>
         </fieldset>
 
-        <fieldset className="border-t border-gray-300">
+        <fieldset className="border-t border-gray-300 mt-8">
           <legend className="text-lg font-medium text-gray-700 px-2">Property Details</legend>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            {/* Country Dropdown */}
+            <div>
+              <label htmlFor="country" className="block text-gray-700 font-medium mb-2">
+                Country <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="country"
+                value={Country_Id}
+                onChange={handleCountryChange}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
+                required
+              >
+                <option value="">Select Country</option>
+                {countryList.map((item) => (
+                  <option key={item.country_id} value={item.country_id}>
+                    {item.country_name}
+                  </option>
+                ))}
+                <option value="Add Country">Add Country</option>
+              </select>
+
+              {Country_Id === 'Add Country' && (
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    placeholder="Enter Country Name"
+                    value={Country_name}
+                    onChange={handelAddCountry}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-2 focus:ring-2 focus:ring-blue-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      addCountry();
+                      getCountry();
+                    }}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                  >
+                    Add Company
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* State Dropdown */}
+            <div>
+              <label htmlFor="state" className="block text-gray-700 font-medium mb-2">
+                State <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="state"
+                value={stateId}
+                onChange={(e) => setStateId(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
+                required
+              >
+                <option value="">Select State</option>
+                {stateList.map((model) => (
+                  <option key={model.state_id} value={model.state_id}>
+                    {model.state_name}
+                  </option>
+                ))}
+                {Country_Id && <option value="Add State">Add State</option>}
+              </select>
+
+              {stateId === 'Add State' && Country_Id && (
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    placeholder="Enter State Name"
+                    value={state_name}
+                    onChange={handelAddState}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-2 focus:ring-2 focus:ring-blue-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={addState}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                  >
+                    Add State
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* City Input */}
+            <div>
+              <label htmlFor="city" className="block text-gray-700 font-medium mb-2">
+                City <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="city"
+                type="text"
+                name="city"
+                placeholder="Enter City"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
+                value={formData.city}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            {/* Location */}
             <div>
               <label htmlFor="location" className="block text-gray-700 font-medium mb-2">
                 Location <span className="text-red-500">*</span>
@@ -141,7 +366,25 @@ const Sell = () => {
               />
             </div>
 
+            {/* Zip Code */}
+            <div>
+              <label htmlFor="zipcode" className="block text-gray-700 font-medium mb-2">
+                Zip Code <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="zipcode"
+                type="text"
+                name="zipcode"
+                placeholder="Enter Zip Code"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
+                value={formData.zipcode}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
 
+
+            {/* Property Type */}
             <div>
               <label htmlFor="propertyType" className="block text-gray-700 font-medium mb-2">
                 Property Type <span className="text-red-500">*</span>
@@ -163,8 +406,9 @@ const Sell = () => {
               </select>
             </div>
 
+            {/* Rent or Sell */}
             <div>
-              <label htmlFor="propertyType" className="block text-gray-700 font-medium mb-2">
+              <label htmlFor="rentsell" className="block text-gray-700 font-medium mb-2">
                 Rent/Sell <span className="text-red-500">*</span>
               </label>
               <select
@@ -176,16 +420,14 @@ const Sell = () => {
                 required
               >
                 <option value="">Select</option>
-                <option value="Apartment">Rent</option>
-                <option value="Apartment">Sell</option>
-
+                <option value="Rent">Rent</option>
+                <option value="Sell">Sell</option>
               </select>
             </div>
-
-
           </div>
 
-          <div>
+          {/* Area */}
+          <div className="mt-6">
             <label htmlFor="area" className="block text-gray-700 font-medium mb-2">
               Area (sq. ft) <span className="text-red-500">*</span>
             </label>
@@ -201,7 +443,7 @@ const Sell = () => {
             />
           </div>
 
-
+          {/* Rooms and Bathrooms */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div>
               <label htmlFor="rooms" className="block text-gray-700 font-medium mb-2">
@@ -235,6 +477,7 @@ const Sell = () => {
             </div>
           </div>
 
+          {/* Halls and Kitchens */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div>
               <label htmlFor="halls" className="block text-gray-700 font-medium mb-2">
@@ -267,8 +510,8 @@ const Sell = () => {
               />
             </div>
           </div>
-
         </fieldset>
+
 
         <fieldset className="border-t border-gray-300">
           <legend className="text-lg font-medium text-gray-700 px-2">Seller Documents</legend>
