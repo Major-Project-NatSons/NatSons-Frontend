@@ -47,18 +47,59 @@ const Sell = () => {
   const handelStateList = (countryId) => {
     getStateByCountry(countryId).then((response) => {
       console.log(response.data);
-
       setStateList(response.data);
     }).catch((error) => {
       console.error("Error fetching states:", error);
     });
+  };
+
+  const handleCountryChange = (e) => {
+    const selectedValue = e.target.value;
+    console.log(selectedValue);
+    setCountry_Id(selectedValue);
+    if (selectedValue !== "Add Country" && selectedValue !== "Select Country") {
+      handelStateList(selectedValue);
+      setFormData({ ...formData, countryId: selectedValue });
+    }
+  };
+
+  const handleStateChange = (e) => {
+    const selectedValue = e.target.value;
+    console.log(selectedValue);
+    setStateId(selectedValue);
   }
+
+  const handelAddCountry = (e) => {
+    setCountry_name(e.target.value);
+  };
+
+  const addCountry = () => {
+    addNewCountry({ country_name: Country_name }).then(() => {
+      console.log("Country Added");
+      getCountry();
+    });
+  };
+
+  const handelAddState = (e) => {
+    setState_name(e.target.value);
+  };
+
+  const addState = () => {
+    addNewState({ stateName: state_name, countryId: Country_Id }).then(() => {
+      console.log("State Added");
+      handelStateList(Country_Id);
+    });
+  };
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    uploadImage(file).then((response) => {
-      console.log(response.data);
-      formData.otherImages.push(response.data.imageUrl);
+    console.log(file);
+
+    uploadImage(file).then((imageUrl) => {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        otherImages: [...prevFormData.otherImages, imageUrl],
+      }));
     }).catch((error) => {
       console.error("Error uploading image:", error);
     });
@@ -67,25 +108,28 @@ const Sell = () => {
 
   const handlePdfUpload = (e) => {
     const file = e.target.files[0];
-    uploadPdf(file).then((response) => {
-      console.log(response.data);
-      formData.pdf = response.data.imageUrl;
+    console.log(file);
+    uploadPdf(file).then((pdfUrl) => {
+      const inputName = e.target.name;
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [inputName]: pdfUrl,
+      }));
     }).catch((error) => {
       console.error("Error uploading pdf:", error);
     });
     setPdf(file);
   };
 
-  useEffect(() => {
+  const getCountry = () => {
     getAllCountries().then((response) => {
-      console.log(response.data);
-
       setCountryList(response.data);
     }).catch((error) => {
       console.error("Error fetching countries:", error);
-    }
-    );
-  }, []);
+    });
+  };
+
+  useEffect(() => { getCountry() }, [])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -98,36 +142,41 @@ const Sell = () => {
       setFormData({ ...formData, [name]: files[0] });
     } else if (name === "registry" || name === "affidavit" || name === "adharCard" || name === "panCard") {
       setFormData({ ...formData, [name]: files[0] });
-    } else {
-      const [key, index] = name.split("-");
+    } else if (name.startsWith("additonalimage")) {
+      const index = parseInt(name.split("-")[1]);
       const updatedImages = [...formData.otherImages];
-      updatedImages[parseInt(index)][key] = files[0];
+      updatedImages[index] = files[0];
       setFormData({ ...formData, otherImages: updatedImages });
+    } else {
+      setFormData({ ...formData, [name]: files[0] });
     }
   };
 
-  const getCountry = () => {
-    getAllCountries().then((response) => {
-      setCountryList(response.data);
-    }).catch((error) => {
-      console.error("Error fetching countries:", error);
-    });
-  }
+  const uploadMainImage = (e) => {
+    const file = e.target.files[0];
+    console.log(file);
+    uploadImage(file).then((imageUrl) => {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        frontImage: imageUrl,
+      }));
+    }).catch((error) =>
+      console.error("Error uploading image:", error))
+  };
+
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
     setFormData({ ...formData, [name]: checked });
   };
 
-
   const handleSubmit = (e) => {
-    e.preventDefault();
     var items = {
       owner_name: formData.name,
       description: formData.description,
       address: formData.location,
-      country_id: formData.countryId,
-      state_id: formData.stateId,
+      country_id: parseInt(Country_Id),
+      state_id: parseInt(stateId),
       city: formData.city,
       zip_code: formData.zipcode,
       area: parseFloat(formData.area),
@@ -140,10 +189,12 @@ const Sell = () => {
       price: parseInt(formData.price),
       image: formData.otherImages,
       main_img: formData.frontImage,
-    }
+      registry: formData.registry,
+      affidivit: formData.affidavit,
+    };
     createNewHome(items).then((response) => {
       console.log(response.data);
-      if (response.status === 200) {
+      if (response.status === 201) {
         alert("Home created successfully");
       } else {
         alert("Failed to create home");
@@ -154,34 +205,32 @@ const Sell = () => {
     console.log("Form Data Submitted:", formData);
   };
 
-  const handleCountryChange = (e) => {
-    const selectedValue = e.target.value;
-    console.log(selectedValue);
-    setCountry_Id(selectedValue);
-    if (selectedValue !== "Add Country" || selectedValue !== "Select Country") {
-      handelStateList(selectedValue);
-      setFormData({ ...formData, countryId: selectedValue });
-    }
+  const uploadPanCard = (e) => {
+    const file = e.target.files[0];
+
+
+    uploadImage(file).then((response) => {
+      console.log(response);
+      setFormData({ ...formData, panCard: response });
+    }).catch((error) => {
+      console.error("Error uploading PAN card:", error);
+    });
   };
 
-  const handelAddCountry = (e) => {
-    setCountry_name(e.target.value);
-  };
+  const uploadAdharCard = (e) => {
+    const file = e.target.files[0];
+    console.log(file);
 
-  const handelAddState = (e) => {
-    setState_name(e.target.value);
-  };
+    uploadImage(file)
+      .then((response) => {
+        console.log(response);
 
-  const addCountry = () => {
-    addNewCountry({ country_name: Country_name }).then(() => {
-      console.log("Country Added");
-    })
-  };
-
-  const addState = () => {
-    addNewState({ stateName: state_name, countryId: Country_Id }).then(() => {
-      console.log("State Added");
-    })
+        console.log("File uploaded successfully:", response);
+        setFormData({ ...formData, adharCard: response });
+      })
+      .catch((error) => {
+        console.error("Error uploading Adhar card:", error);
+      });
   };
 
   return (
@@ -247,7 +296,6 @@ const Sell = () => {
           <legend className="text-lg font-medium text-gray-700 px-2">Property Details</legend>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            {/* Country Dropdown */}
             <div>
               <label htmlFor="country" className="block text-gray-700 font-medium mb-2">
                 Country <span className="text-red-500">*</span>
@@ -285,13 +333,12 @@ const Sell = () => {
                     }}
                     className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                   >
-                    Add Company
+                    Add Country
                   </button>
                 </div>
               )}
             </div>
 
-            {/* State Dropdown */}
             <div>
               <label htmlFor="state" className="block text-gray-700 font-medium mb-2">
                 State <span className="text-red-500">*</span>
@@ -299,7 +346,10 @@ const Sell = () => {
               <select
                 id="state"
                 value={stateId}
-                onChange={(e) => setStateId(e.target.value)}
+                onChange={(e) => {
+                  console.log(e.target.value);
+                  setStateId(e.target.value)
+                }}
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
                 required
               >
@@ -332,7 +382,6 @@ const Sell = () => {
               )}
             </div>
 
-            {/* City Input */}
             <div>
               <label htmlFor="city" className="block text-gray-700 font-medium mb-2">
                 City <span className="text-red-500">*</span>
@@ -349,7 +398,6 @@ const Sell = () => {
               />
             </div>
 
-            {/* Location */}
             <div>
               <label htmlFor="location" className="block text-gray-700 font-medium mb-2">
                 Location <span className="text-red-500">*</span>
@@ -366,7 +414,6 @@ const Sell = () => {
               />
             </div>
 
-            {/* Zip Code */}
             <div>
               <label htmlFor="zipcode" className="block text-gray-700 font-medium mb-2">
                 Zip Code <span className="text-red-500">*</span>
@@ -383,8 +430,6 @@ const Sell = () => {
               />
             </div>
 
-
-            {/* Property Type */}
             <div>
               <label htmlFor="propertyType" className="block text-gray-700 font-medium mb-2">
                 Property Type <span className="text-red-500">*</span>
@@ -406,7 +451,6 @@ const Sell = () => {
               </select>
             </div>
 
-            {/* Rent or Sell */}
             <div>
               <label htmlFor="rentsell" className="block text-gray-700 font-medium mb-2">
                 Rent/Sell <span className="text-red-500">*</span>
@@ -426,8 +470,7 @@ const Sell = () => {
             </div>
           </div>
 
-          {/* Area */}
-          <div className="mt-6">
+          <div>
             <label htmlFor="area" className="block text-gray-700 font-medium mb-2">
               Area (sq. ft) <span className="text-red-500">*</span>
             </label>
@@ -443,7 +486,6 @@ const Sell = () => {
             />
           </div>
 
-          {/* Rooms and Bathrooms */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div>
               <label htmlFor="rooms" className="block text-gray-700 font-medium mb-2">
@@ -477,7 +519,6 @@ const Sell = () => {
             </div>
           </div>
 
-          {/* Halls and Kitchens */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
             <div>
               <label htmlFor="halls" className="block text-gray-700 font-medium mb-2">
@@ -512,7 +553,6 @@ const Sell = () => {
           </div>
         </fieldset>
 
-
         <fieldset className="border-t border-gray-300">
           <legend className="text-lg font-medium text-gray-700 px-2">Seller Documents</legend>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
@@ -525,7 +565,7 @@ const Sell = () => {
                 type="file"
                 name="adharCard"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
-                onChange={handleFileChange}
+                onChange={uploadAdharCard}
                 required
               />
             </div>
@@ -538,7 +578,7 @@ const Sell = () => {
                 type="file"
                 name="panCard"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
-                onChange={handleFileChange}
+                onChange={uploadPanCard}
                 required
               />
             </div>
@@ -553,11 +593,11 @@ const Sell = () => {
                 Front Image <span className="text-red-500">*</span>
               </label>
               <input
-                id="frontimage"
+                id="frontImage"
                 type="file"
-                name="frontimage"
+                name="frontImage"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
-                onChange={handleFileChange}
+                onChange={uploadMainImage}
                 required
               />
             </div>
@@ -570,7 +610,7 @@ const Sell = () => {
                 type="file"
                 name="additonalimage"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
-                onChange={handleFileChange}
+                onChange={handleImageUpload}
                 required
               />
             </div>
@@ -583,7 +623,7 @@ const Sell = () => {
                 type="file"
                 name="additonalimage"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
-                onChange={handleFileChange}
+                onChange={handleImageUpload}
                 required
               />
             </div>
@@ -596,7 +636,7 @@ const Sell = () => {
                 type="file"
                 name="additonalimage"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
-                onChange={handleFileChange}
+                onChange={handleImageUpload}
                 required
               />
             </div>
@@ -609,18 +649,13 @@ const Sell = () => {
                 type="file"
                 name="additonalimage"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
-                onChange={handleFileChange}
+                onChange={handleImageUpload}
                 required
               />
             </div>
 
           </div>
         </fieldset>
-
-
-
-
-
         <fieldset className="border-t border-gray-300">
           <legend className="text-lg font-medium text-gray-700 px-2">Documents</legend>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
@@ -633,7 +668,7 @@ const Sell = () => {
                 type="file"
                 name="registry"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
-                onChange={handleFileChange}
+                onChange={handlePdfUpload}
                 required
               />
             </div>
@@ -646,7 +681,7 @@ const Sell = () => {
                 type="file"
                 name="affidavit"
                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-400"
-                onChange={handleFileChange}
+                onChange={handlePdfUpload}
                 required
               />
             </div>

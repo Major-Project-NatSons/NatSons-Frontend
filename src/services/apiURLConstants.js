@@ -4,6 +4,7 @@ const loginApi = `${serverURl}/users/login`;
 const signupApi = `${serverURl}/users/register`;
 const userProfileIdApi = `${serverURl}/users/profile/`;
 const createNewHouseApi = `${serverURl}/homes/addNewHome`;
+const getAllHousesApi = `${serverURl}/homes/getAllHomes`;
 const addCountryApi = `${serverURl}/countries/add-new-country`;
 const getAllCountriesApi = `${serverURl}/countries/get-all-countries`;
 const addStateApi = `${serverURl}/states/add-new-state`;
@@ -21,4 +22,5 @@ export {
     getStateByCountryApi,
     imageUploadApi,
     pdfUploadApi,
+    getAllHousesApi,
 };

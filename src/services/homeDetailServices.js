@@ -1,8 +1,8 @@
 import axios from "axios";
-import { createNewHouseApi } from "./apiURLConstants";
+import { createNewHouseApi, getAllHousesApi } from "./apiURLConstants";
 
 
-const createNewHome = async(homeData)=>{
+const createNewHome = async (homeData) => {
     try {
         const token = localStorage.getItem("userToken");
         const response = await axios.post(createNewHouseApi, homeData, {
@@ -17,4 +17,14 @@ const createNewHome = async(homeData)=>{
     }
 }
 
-export {createNewHome}
+const getAllHomes = async () => {
+    try {
+        const response = await axios.get(getAllHousesApi);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching all homes:", error);
+        throw error;
+    }
+};
+
+export { createNewHome, getAllHomes, }

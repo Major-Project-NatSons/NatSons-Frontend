@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Card from "./Card";
+import { getAllHomes } from "../services/homeDetailServices";
 
 const Buy = () => {
     const [filters, setFilters] = useState({
@@ -8,10 +9,23 @@ const Buy = () => {
         price: "",
     });
 
+    const [properties, setProperties] = useState(null);
+
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         setFilters({ ...filters, [name]: value });
     };
+
+    useEffect(() => {
+        getAllHomes().then((response) => {
+            console.log(response);
+            
+            setProperties(response.data);
+        }
+        ).catch((error) => {
+            console.error("Error fetching properties:", error);
+        });
+    },[]);
 
     return (
         <section className="container mx-auto px-6 md:px-20 py-8 bg-light-bg">
@@ -82,96 +96,28 @@ const Buy = () => {
                     </div>
                 </div>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                    {
-                        image: "/home.jpg",
-                        title: "Modern Family Home",
-                        description: "A spacious family home with a large garden.",
-                        price: "$1800",
-                        bed: "3",
-                        hall: "2",
-                        bathroom: "3",
-                    },
-                    {
-                        image: "/home.jpg",
-                        title: "Luxury Townhouse",
-                        description: "An elegant townhouse with a contemporary design.",
-                        price: "$2500",
-                        bed: "4",
-                        hall: "2",
-                        bathroom: "4",
-                    },
-                    {
-                        image: "/home.jpg",
-                        title: "Suburban Retreat",
-                        description: "A peaceful home in a quiet suburban area.",
-                        price: "$1400",
-                        bed: "3",
-                        hall: "1",
-                        bathroom: "2",
-                    },
-                    {
-                        image: "/home.jpg",
-                        title: "Beachside Haven",
-                        description: "A beautiful property just minutes from the beach.",
-                        price: "$2200",
-                        bed: "4",
-                        hall: "3",
-                        bathroom: "4",
-                    },
-                    {
-                        image: "/home.jpg",
-                        title: "Downtown Apartment",
-                        description: "A chic apartment in the heart of the city.",
-                        price: "$2000",
-                        bed: "2",
-                        hall: "1",
-                        bathroom: "2",
-                    },
-                    {
-                        image: "/home.jpg",
-                        title: "Cozy Cottage",
-                        description: "A quaint cottage with a warm and inviting interior.",
-                        price: "$1200",
-                        bed: "2",
-                        hall: "1",
-                        bathroom: "1",
-                    },
-                    {
-                        image: "/home.jpg",
-                        title: "Elegant Villa",
-                        description: "A luxurious villa with a private pool and garden.",
-                        price: "$3000",
-                        bed: "5",
-                        hall: "3",
-                        bathroom: "5",
-                    },
-                    {
-                        image: "/home.jpg",
-                        title: "Compact Studio",
-                        description: "A compact yet functional studio for urban living.",
-                        price: "$1000",
-                        bed: "1",
-                        hall: "0",
-                        bathroom: "1",
-                    },
-                ].map((category, index) => (
-                    <Card
-                        shadowColor="shadow-blue-400"
-                        buttonColor="bg-blue-500 hover:bg-blue-600"
-                        key={index}
-                        image={category.image}
-                        title={category.title}
-                        description={category.description}
-                        price={category.price}
-                        bed={category.bed}
-                        hall={category.hall}
-                        bathroom={category.bathroom}
-                    />
-                ))}
-            </div>
+            {
+                properties && properties.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {properties.map((property, index) => (
+                            <Card
+                                shadowColor="shadow-blue-400"
+                                buttonColor="bg-blue-500 hover:bg-blue-600"
+                                key={index}
+                                image={property.main_img}
+                                title={property.title}
+                                description={property.description}
+                                price={property.price}
+                                bed={property.number_of_rooms}
+                                hall={property.no_of_halls}
+                                bathroom={property.number_of_bathrooms}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-center text-gray-500">No properties found.</p>
+                )
+            }
         </section>
     );
 };
