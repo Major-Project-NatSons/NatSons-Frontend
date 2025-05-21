@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createNewHouseApi, getAllHousesApi } from "./apiURLConstants";
+import { createNewHouseApi, getAllHousesApi, getHomeByIdApi } from "./apiURLConstants";
 
 
 const createNewHome = async (homeData) => {
@@ -27,4 +27,14 @@ const getAllHomes = async () => {
     }
 };
 
-export { createNewHome, getAllHomes, }
+const getHomeById = async (homeId) => {
+    try {
+        const response = await axios.get(`${getHomeByIdApi}${homeId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching home by ID:", error);
+        throw error;
+    }
+}
+
+export { createNewHome, getAllHomes, getHomeById };

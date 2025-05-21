@@ -11,6 +11,7 @@ const addStateApi = `${serverURl}/states/add-new-state`;
 const getStateByCountryApi = `${serverURl}/states/get-states-by-country/`;
 const imageUploadApi = `${serverURl}/cdn/upload/single`;
 const pdfUploadApi = `${serverURl}/cdn/upload/pdf`;
+const getHomeByIdApi = `${serverURl}/homes/getHomeById/`;
 export { 
     loginApi,
     signupApi,
@@ -23,4 +24,5 @@ export {
     imageUploadApi,
     pdfUploadApi,
     getAllHousesApi,
+    getHomeByIdApi
 };

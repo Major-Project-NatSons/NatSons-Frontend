@@ -3,8 +3,17 @@ import { CiHeart } from "react-icons/ci";
 import { FaBed } from "react-icons/fa";
 import { GiSoccerField } from "react-icons/gi";
 import { MdBathroom } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
-const Card = ({ image, title, description, price, bed, hall, bathroom, shadowColor, buttonColor }) => {
+const Card = ({ image, title, description, price, bed, hall, bathroom, shadowColor, buttonColor, homeId }) => {
+  const navigate = useNavigate();
+
+  const handleViewClick = () => {
+    if (homeId) {
+      navigate(`/home/${homeId}`);
+    }
+  };
+
   return (
     <div className={`flex flex-col items-center bg-white rounded-3xl cursor-pointer shadow-md ${shadowColor}`}>
       <img
@@ -16,7 +25,7 @@ const Card = ({ image, title, description, price, bed, hall, bathroom, shadowCol
         <div className="flex items-center justify-between mb-2">
           <div>
             <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-            <span className="text-sm text-gray-600">{price}</span>
+            <span className="text-sm text-gray-600">₹{price}</span>
           </div>
           <CiHeart size={22} className="text-red-500 cursor-pointer" />
         </div>
@@ -37,7 +46,10 @@ const Card = ({ image, title, description, price, bed, hall, bathroom, shadowCol
           </div>
         </div>
         <hr className="my-4" />
-        <button className={`w-full py-2 text-white rounded-lg ${buttonColor}`}>
+        <button
+          onClick={handleViewClick}
+          className={`w-full py-2 text-white rounded-lg ${buttonColor}`}
+        >
           View
         </button>
       </div>

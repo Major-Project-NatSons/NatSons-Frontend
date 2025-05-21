@@ -11,7 +11,7 @@ import LoginSignUp from "./components/LoginSignUp";
 import SignUp from "./components/SignUp";
 import Planview from "./components/planview";
 import AttendancePayment from "./components/attendancepayment";
-
+import HomeDetails from "./components/pages/HomeDetails";
 
 
 
@@ -34,6 +34,7 @@ function App() {
             <Route path='/signup' element={<SignUp />} />
             <Route path="/planview" element={<Planview />}/>
             <Route path="/attendance-payment" element={<AttendancePayment />} />
+            <Route path="/home/:homeId" element={<HomeDetails />} />
           </Routes>
         </div>
       </div>
