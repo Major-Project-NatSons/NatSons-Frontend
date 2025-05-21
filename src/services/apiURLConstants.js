@@ -12,6 +12,7 @@ const getStateByCountryApi = `${serverURl}/states/get-states-by-country/`;
 const imageUploadApi = `${serverURl}/cdn/upload/single`;
 const pdfUploadApi = `${serverURl}/cdn/upload/pdf`;
 const getHomeByIdApi = `${serverURl}/homes/getHomeById/`;
+const generateFloorPlansApi = `http://localhost:5000/generate_floor_plans`;
 export { 
     loginApi,
     signupApi,
@@ -24,5 +25,6 @@ export {
     imageUploadApi,
     pdfUploadApi,
     getAllHousesApi,
-    getHomeByIdApi
+    getHomeByIdApi,
+    generateFloorPlansApi
 };

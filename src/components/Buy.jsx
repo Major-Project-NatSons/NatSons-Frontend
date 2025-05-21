@@ -18,34 +18,58 @@ const Buy = () => {
     };
 
     useEffect(() => {
-        getAllHomes().then((response) => {
-            console.log(response);
-            setProperties(response.data);
-        }).catch((error) => {
-            console.error("Error fetching properties:", error);
-        });
+        getAllHomes()
+            .then((response) => {
+                console.log("API data:", response.data); // Debugging
+                const normalizedData = response.data.map((property) => ({
+                    ...property,
+                    buy_rent: property.buy_rent?.toLowerCase() || "",
+                    property_type: property.property_type?.toLowerCase() || "",
+                }));
+                setProperties(normalizedData);
+            })
+            .catch((error) => {
+                console.error("Error fetching properties:", error);
+            });
     }, []);
 
-    // Filtering logic applied on properties based on filters state
-    const filteredProperties = properties ? properties.filter((property) => {
-        // Filter by location (case insensitive substring match)
-        if (filters.location && !property.location.toLowerCase().includes(filters.location.toLowerCase())) {
-            return false;
-        }
-        // Filter by propertyType (exact match)
-        if (filters.propertyType && property.property_type !== filters.propertyType) {
-            return false;
-        }
-        // Filter by price (property price should be less than or equal to filter price)
-        if (filters.price && Number(property.price) > Number(filters.price)) {
-            return false;
-        }
-        // Filter by buyrent (exact match)
-        if (filters.buyrent && property.buy_rent !== filters.buyrent) {
-            return false;
-        }
-        return true;
-    }) : [];
+    const filteredProperties = properties
+        ? properties.filter((property) => {
+            // Location filter (case-insensitive)
+            if (
+                filters.location &&
+                !property.location.toLowerCase().includes(filters.location.toLowerCase())
+            ) {
+                return false;
+            }
+
+            // Property Type filter
+            if (
+                filters.propertyType &&
+                property.property_type !== filters.propertyType.toLowerCase()
+            ) {
+                return false;
+            }
+
+            // Price filter
+            if (
+                filters.price &&
+                Number(property.price) > Number(filters.price)
+            ) {
+                return false;
+            }
+
+            // Buy/Rent filter
+            if (
+                filters.buyrent &&
+                property.buy_rent !== filters.buyrent.toLowerCase()
+            ) {
+                return false;
+            }
+
+            return true;
+        })
+        : [];
 
     return (
         <section className="container mx-auto px-6 md:px-20 py-8 bg-light-bg">
@@ -116,29 +140,28 @@ const Buy = () => {
                     </div>
                 </div>
             </div>
-            {
-                filteredProperties && filteredProperties.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {filteredProperties.map((property, index) => (
-                            <Card
-                                shadowColor="shadow-blue-400"
-                                buttonColor="bg-blue-500 hover:bg-blue-600"
-                                key={index}
-                                image={property.main_img}
-                                title={property.title}
-                                description={property.description}
-                                price={property.price}
-                                bed={property.number_of_rooms}
-                                hall={property.no_of_halls}
-                                bathroom={property.number_of_bathrooms}
-                                homeId={property.home_id}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-center text-gray-500">No properties found.</p>
-                )
-            }
+
+            {filteredProperties.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {filteredProperties.map((property, index) => (
+                        <Card
+                            shadowColor="shadow-blue-400"
+                            buttonColor="bg-blue-500 hover:bg-blue-600"
+                            key={index}
+                            image={property.main_img}
+                            title={property.title}
+                            description={property.description}
+                            price={property.price}
+                            bed={property.number_of_rooms}
+                            hall={property.no_of_halls}
+                            bathroom={property.number_of_bathrooms}
+                            homeId={property.home_id}
+                        />
+                    ))}
+                </div>
+            ) : (
+                <p className="text-center text-gray-500">No properties found.</p>
+            )}
         </section>
     );
 };

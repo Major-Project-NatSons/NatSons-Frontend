@@ -1,26 +1,34 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getHomeById } from "../../services/homeDetailServices";
+import Notification from "../Notification";
 
 const HomeDetails = () => {
   const { homeId } = useParams();
   const [homeDetails, setHomeDetails] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     getHomeById(homeId)
       .then((response) => {
         setHomeDetails(response.data);
+        setErrorMessage(""); // Clear any previous error
       })
       .catch((error) => {
         console.error("Error fetching home details:", error);
+        setErrorMessage("Failed to load home details. Please try again later.");
       });
   }, [homeId]);
 
   if (!homeDetails) {
     return (
-      <p className="container mx-auto px-6 md:px-20 py-8 bg-light-bg">
-        Loading home details...
-      </p>
+      <div className="container mx-auto px-6 md:px-20 py-8 bg-light-bg">
+        {errorMessage ? (
+          <Notification type="error" message={errorMessage} onClose={() => setErrorMessage("")} />
+        ) : (
+          <p>Loading home details...</p>
+        )}
+      </div>
     );
   }
 
