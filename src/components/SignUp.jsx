@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../services/loginSignupService";
+import { mongoSignup } from "../services/mongoDBAuthServices";
 
 const SignUp = () => {
     const [name, setName] = useState("");
@@ -55,7 +56,16 @@ const SignUp = () => {
 
         console.log("Form submitted successfully:", { name, email, phone, password });
         var items = {name,email,phone,password};
+        var mongoItems = {name,email,password};
         var user = registerUser(items);
+        var mongoUser = mongoSignup(mongoItems);
+        mongoUser.then((res)=>{
+            console.log(res);
+            if (res.error) {
+                alert(res.error);
+                return;
+            }
+        });
         user.then((
             res
         )=>{

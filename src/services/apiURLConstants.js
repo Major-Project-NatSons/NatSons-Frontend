@@ -1,7 +1,9 @@
 const serverURl = 'http://localhost:8000/api';
-
+const mongoServerURL = "http://localhost:3000/"
 const loginApi = `${serverURl}/users/login`;
 const signupApi = `${serverURl}/users/register`;
+const mongoDBLoginAPI = `${mongoServerURL}api/auth/login`;
+const mongoDBSignupAPI = `${mongoServerURL}api/auth/signup`;
 const userProfileIdApi = `${serverURl}/users/profile/`;
 const createNewHouseApi = `${serverURl}/homes/addNewHome`;
 const getAllHousesApi = `${serverURl}/homes/getAllHomes`;
@@ -26,5 +28,7 @@ export {
     pdfUploadApi,
     getAllHousesApi,
     getHomeByIdApi,
-    generateFloorPlansApi
+    generateFloorPlansApi,
+    mongoDBLoginAPI,
+    mongoDBSignupAPI
 };

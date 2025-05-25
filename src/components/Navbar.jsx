@@ -44,12 +44,12 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 flex items-center justify-between px-8 py-4 font-poppins bg-white shadow-xl transition-all ease-in-out duration-300">
-      <div className="w-[140px] h-auto -mt-3">
-        <img src="/logo1.png" alt="Logo" className="w-full h-auto" />
-      </div>
+        <div className="w-[140px] h-auto -mt-3">
+          <img src="/logo1.png" alt="Logo" className="w-full h-auto" onClick={() => navigate("/")} />
+        </div>
 
       <div className="hidden md:flex items-center gap-12 text-lg">
-        <NavLink
+        {/* <NavLink
           to="/"
           className={({ isActive }) =>
             `text-gray-800 hover:text-blue-600 ${
@@ -58,7 +58,7 @@ const Navbar = () => {
           }
         >
           Home
-        </NavLink>
+        </NavLink> */}
         <NavLink
           to="/buy"
           className={({ isActive }) =>
@@ -67,7 +67,7 @@ const Navbar = () => {
             } transition-all duration-300`
           }
         >
-          Buy
+          Buy/Rent
         </NavLink>
         <NavLink
           to="/sell"
@@ -77,7 +77,7 @@ const Navbar = () => {
             } transition-all duration-300`
           }
         >
-          Forum
+          Sell
         </NavLink>
         <NavLink
           to="/attendance"
@@ -97,7 +97,7 @@ const Navbar = () => {
             } transition-all duration-300`
           }
         >
-          Plan
+          Generate Floor PLan
         </NavLink>
         <NavLink
           to="/contact"
@@ -107,7 +107,7 @@ const Navbar = () => {
             } transition-all duration-300`
           }
         >
-          Contact
+          Contact Us
         </NavLink>
       </div>
 
