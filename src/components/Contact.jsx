@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import addContactMessage from '../services/contactServices';
 
 const Contact = () => {
   useEffect(() => {
@@ -31,14 +31,18 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8888/api/contacts', formData);
+      await addContactMessage(formData);
       setStatus('Message sent successfully!');
-      setFormData({ name: '', email: '', message: '' }); // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        message: '',
+      });
     } catch (error) {
       setStatus('Failed to send message. Please try again later.');
-      console.error(error);
+      console.error('Error adding contact message:', error);
     }
-  };
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen py-12 px-6 sm:px-12 relative">

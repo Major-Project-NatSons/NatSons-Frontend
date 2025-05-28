@@ -14,6 +14,9 @@ const getStateByCountryApi = `${serverURl}/states/get-states-by-country/`;
 const imageUploadApi = `${serverURl}/cdn/upload/single`;
 const pdfUploadApi = `${serverURl}/cdn/upload/pdf`;
 const getHomeByIdApi = `${serverURl}/homes/getHomeById/`;
+const addContactApi = `${serverURl}/contacts/add-contact-message`;
+const getAllContactsApi = `${serverURl}/contacts/get-all-contact-messages`;
+
 const generateFloorPlansApi = `http://localhost:5000/generate_floor_plans`;
 export { 
     loginApi,
@@ -30,5 +33,7 @@ export {
     getHomeByIdApi,
     generateFloorPlansApi,
     mongoDBLoginAPI,
+    addContactApi,
+    getAllContactsApi,
     mongoDBSignupAPI
 };
